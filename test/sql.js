@@ -93,5 +93,22 @@ describe('Halbmesser PostgreSQL driver', function () {
             });
         });
         
+        it('should return false in case of error in any of the queries', function () {
+            pgtest.expect('SELECT * FROM radcheck WHERE username = $1', ['testUser']).returning(null, []);
+            pgtest.expect('SELECT * FROM radreply WHERE username = $1', ['testUser']).returning('err', []);
+            load_user_sql(params, [], function (r) {
+                expect(r).to.be.equal(false);
+            });
+            pgtest.check();
+            pgtest.reset();
+            
+            pgtest.expect('SELECT * FROM radcheck WHERE username = $1', ['testUser']).returning('err', []);
+            pgtest.expect('SELECT * FROM radreply WHERE username = $1', ['testUser']).returning(null, []);
+
+            load_user_sql(params, [], function (r) {
+                expect(r).to.be.equal(false);
+            });
+            pgtest.check();
+        });
     });
 });
